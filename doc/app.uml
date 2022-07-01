@@ -1,0 +1,184 @@
+@startuml
+
+package "infra" {
+	class "AWSService" as infra.AWSService <<V,Orchid>> {
+		-session: session.Session
+	}
+}
+
+
+
+package "infra" {
+	class "EmailData" as infra.EmailData <<E,#FFCC00>> {
+		+To: string
+		+Subject: string
+		+Body: string
+		+SendEmail(s: session.Session): error
+	}
+}
+
+
+
+package "infra" {
+	class "SQSMessagePayload" as infra.SQSMessagePayload <<V,Orchid>> {
+		+AreaCode: int
+		+Title: string
+		+DistributionID: string
+		+DistributionType: string
+		+RowXMLPath: string
+		+IntegrationType: int
+		+IntegrationDestination: string
+	}
+}
+
+
+
+package "router" {
+	class "Router" as router.Router <<V,Orchid>> {
+		+API: gin.Engine
+	}
+}
+
+
+
+package "gateway" {
+	class "userRepositoryImpl" as gateway.userRepositoryImpl <<V,Orchid>> {
+		-sqlHandler: database.DBHandler
+		+FindAll(ctx: context.Context): (entity.User, error)
+		+FindWithID(ctx: context.Context, id: int): (entity.User, error)
+		+Create(ctx: context.Context, e: entity.User): error
+	}
+}
+
+	gateway.userRepositoryImpl --> database.DBHandler
+
+	gateway.userRepositoryImpl ..> entity.User : <<return>> 
+	gateway.userRepositoryImpl ..> entity.User : <<return>> 
+	gateway.userRepositoryImpl ..> entity.User : <<use>> 
+
+package "usecase" {
+	interface "UserUseCase" as usecase.UserUseCase {
+		+CreateUser(ctx: context.Context, m: model.UserModel): error
+		+UserWithID(ctx: context.Context, id: int): (model.UserModel, error)
+		+Users(ctx: context.Context): (model.UserModel, error)
+	}
+}
+
+
+	usecase.UserUseCase ..> model.UserModel : <<use>> 
+	usecase.UserUseCase ..> model.UserModel : <<return>> 
+	usecase.UserUseCase ..> model.UserModel : <<return>> 
+
+package "database" {
+	class "DBConfig" as database.DBConfig <<V,Orchid>> {
+		+Host: string
+		+Username: string
+		+Password: string
+		+DBName: string
+		+Port: string
+	}
+}
+
+
+
+package "database" {
+	interface "DBHandler" as database.DBHandler {
+		+Close(db: gorm.DB)
+		+Open(): gorm.DB
+	}
+}
+
+
+
+package "database" {
+	class "mysqlHandlerImpl" as database.mysqlHandlerImpl <<E,#FFCC00>> {
+		-config: *database.DBConfig
+		+Conn: gorm.DB
+		+Open(): gorm.DB
+		+Close(db: gorm.DB)
+	}
+}
+
+	database.mysqlHandlerImpl --> database.DBConfig
+
+
+package "model" {
+	class "UserModel" as model.UserModel <<V,Orchid>> {
+		+ID: uint64
+		+Name: string
+		+MailAddress: string
+		+Birthday: time.Time
+	}
+}
+
+
+
+package "repository" {
+	interface "UserRepository" as repository.UserRepository {
+		+Create(ctx: context.Context, e: entity.User): error
+		+FindAll(ctx: context.Context): (entity.User, error)
+		+FindWithID(ctx: context.Context, id: int): (entity.User, error)
+	}
+}
+
+
+	repository.UserRepository ..> entity.User : <<use>> 
+	repository.UserRepository ..> entity.User : <<return>> 
+	repository.UserRepository ..> entity.User : <<return>> 
+
+package "config" {
+	class "Config" as config.Config <<V,Orchid>> {
+		+DB: struct{Host: string; Username: string; Password: string; DBName: string; Port: string}
+		+Token: string
+	}
+}
+
+
+
+package "handler" {
+	class "UserHandler" as handler.UserHandler <<V,Orchid>> {
+		-useCase: usecase.UserUseCase
+		+Users(): gin.HandlerFunc
+		+User(): gin.HandlerFunc
+		+CreateUser(): gin.HandlerFunc
+	}
+}
+
+	handler.UserHandler --> usecase.UserUseCase
+
+
+package "entity" {
+	class "User" as entity.User <<V,Orchid>> {
+		+ID: uint64
+		+Name: string
+		+MailAddress: string
+		+Birthday: time.Time
+		+CreatedAt: time.Time
+		+UpdatedAt: time.Time
+		+TableName(): string
+	}
+}
+
+
+
+package "interactor" {
+	class "userUseCaseImpl" as interactor.userUseCaseImpl <<V,Orchid>> {
+		-repository: repository.UserRepository
+		+Users(ctx: context.Context): (model.UserModel, error)
+		+UserWithID(ctx: context.Context, id: int): (model.UserModel, error)
+		+CreateUser(ctx: context.Context, m: model.UserModel): error
+	}
+}
+
+	interactor.userUseCaseImpl --> repository.UserRepository
+
+	interactor.userUseCaseImpl ..> model.UserModel : <<return>> 
+	interactor.userUseCaseImpl ..> model.UserModel : <<return>> 
+	interactor.userUseCaseImpl ..> model.UserModel : <<use>> 
+
+	gateway.userRepositoryImpl -up-|> repository.UserRepository
+	database.mysqlHandlerImpl -up-|> database.DBHandler
+	interactor.userUseCaseImpl -up-|> usecase.UserUseCase
+
+
+@enduml
