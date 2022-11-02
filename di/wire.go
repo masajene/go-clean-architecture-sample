@@ -5,7 +5,7 @@ package di
 
 import (
 	"github.com/google/wire"
-	"go_api_boilerplate/interfaces/handler"
+	"go_api_boilerplate/adapter/handler"
 )
 
 func InitUserApp() *handler.UserHandler {

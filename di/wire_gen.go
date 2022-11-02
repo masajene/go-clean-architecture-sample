@@ -8,8 +8,8 @@ package di
 import (
 	"go_api_boilerplate/domain/interactor"
 	"go_api_boilerplate/infra/database"
-	"go_api_boilerplate/interfaces/gateway"
-	"go_api_boilerplate/interfaces/handler"
+	"go_api_boilerplate/adapter/gateway"
+	"go_api_boilerplate/adapter/handler"
 )
 
 // Injectors from wire.go:

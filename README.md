@@ -4,6 +4,7 @@
 
 ```
 ├── Makefile
+├── README.md
 ├── application
 │   ├── model
 │   │   └── user_model.go
@@ -11,11 +12,25 @@
 │   │   └── user_repository.go
 │   └── usecase
 │       └── user_usecase.go
+├── builds
+│   └── go
+│       └── Dockerfile
+├── cmd
+│   ├── lambda
+│   │   └── lambda.go
+│   └── main
+│       └── main.go
 ├── config
 │   └── config.go
+├── core
+│   ├── error_model.go
+│   ├── log.go
+│   └── time.go
 ├── di
 │   ├── wire.go
 │   └── wire_gen.go
+├── doc
+├── docker-compose.yml
 ├── domain
 │   ├── entity
 │   │   └── user.go
@@ -23,6 +38,8 @@
 │   │   └── user_interactor.go
 │   └── validation
 │       └── validation.go
+├── go.mod
+├── go.sum
 ├── infra
 │   ├── aws
 │   │   ├── aws.go
@@ -40,13 +57,5 @@
 │   │   └── user_repository.go
 │   └── handler
 │       └── user_handler.go
-├── lambda.go
-├── main.go
-├── tmp
-│   ├── build-errors.log
-│   └── main
-└── utils
-    ├── error_model.go
-    ├── log.go
-    └── time.go
+└── tmp
 ```

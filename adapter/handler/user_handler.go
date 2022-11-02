@@ -3,12 +3,12 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+	"go_api_boilerplate/adapter/gateway"
 	"go_api_boilerplate/application/model"
 	"go_api_boilerplate/application/usecase"
 	"go_api_boilerplate/core"
 	"go_api_boilerplate/domain/interactor"
 	"go_api_boilerplate/infra/database"
-	"go_api_boilerplate/interfaces/gateway"
 	"net/http"
 	"strconv"
 )
